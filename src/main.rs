@@ -31,14 +31,16 @@ async fn health() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("🦀 Carbon service starting on http://localhost:8001");
-    
+    let port = std::env::var("PORT").unwrap_or_else(|_| "8001".to_string());
+    let bind_addr = format!("0.0.0.0:{}", port);
+    println!("🦀 Carbon service starting on {}", bind_addr);
+
     HttpServer::new(|| {
         App::new()
             .route("/health", web::get().to(health))
             .route("/calculate", web::post().to(calculate_carbon))
     })
-    .bind("127.0.0.1:8001")?
+    .bind(&bind_addr)?
     .run()
     .await
 }
